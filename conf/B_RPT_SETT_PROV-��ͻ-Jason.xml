@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--最低结算备付金报告组合每天的最低结算备付金数据D33_SettlProvision-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+		   <querysql>  SELECT FND_SHT_DESCRIPTION 基金名称,
+   PUR_S               上海买入证券金额,
+   PUR_SHZ             深圳买入证券金额,
+   MIN_S               上海最低结算备付金,
+   MIN_SHZ             深圳最低结算备付金,
+   BAL_S               上海最低备付金,
+   BAL_SHZ             深圳最低备付金,
+   ADJ_BAL_S           调整上海最低备付金,
+   ADJ_BAL_SHZ         调整深圳最低备付金,
+   TOTAL_ADJ           合计调整最低备付金
+  FROM TABLE(FNC_SETTLPROVISION ((SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+                                            FROM REF_FUND F
+                                           WHERE FND_END_VALIDITY = DATE '2199-12-31'
+                                             AND $X{IN,F.ID_FND_CODE,fundsList}
+                                             AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),
+                                 $P{startDate}, $P{endDate},$P{AdjRate},$P{ShareRate},$P{BondRate},$P{FundRate},$P{WarrRate},$P{LRRRate},$P{LRRate},$P{LORRate}, $P{BalanceDate}))
+
+</querysql
+           
+           <cols>
+ 
+ 
+ <col><name>FUNDCODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>VALUATIONDATE</name><mapping></mapping><type>date</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>FND_SHT_DESCRIPTION</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>PUR_S</name><mapping>row[1]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PUR_SHZ</name><mapping>row[2]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>MIN_S</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>MIN_SHZ</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>BAL_S</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>BAL_SHZ</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>ADJ_BAL_S</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>ADJ_BAL_SHZ</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>TOTAL_ADJ</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>AdjRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>ShareRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>BondRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>FundRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>WarrRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>LRRRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>LRRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>LORRate</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+
+
+           </cols>
+
+        </configuration>

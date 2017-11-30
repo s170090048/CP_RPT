@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--估值持仓表-KNB	马来国库单组合-->
+ <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+             <querysql>
+				 </querysql>
+            <cols>
+				<col><name>FUNDCODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>VALUATIONDATE</name><mapping></mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+				<col><name>ID_GLA_ACCOUNT</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>GLA_LNG_DESCRIPTION</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ID_INS_CODE</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>NDNA_SHARE_PAR</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>UNIT_PRICE</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>NDNA_FUND_COST_PRICE</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>COST_N</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>NDNA_VALUATION_PRICE</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>MV</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>MV_N</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>GZZZ</name><mapping>row[10]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>MARKET_CAP</name><mapping>row[11]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>SHARE_OS</name><mapping>row[12]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>HOLDING</name><mapping>row[13]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>FND_LNG_DESC</name><mapping>row[14] </mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>TOTAL_NAV</name><mapping>row[15] </mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>INC_DAY</name><mapping>row[16] </mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>INC_PERIOD</name><mapping>row[17] </mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>INC_ACC</name><mapping>row[18] </mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>ETLDATE</name><mapping>datetime.datetime.strptime(datetime.datetime.today().strftime('%Y-%m-%d %H-%M-%S'),'%Y-%m-%d %H-%M-%S')DATE</type><loader_format>DATE 'YYYY-MM-DD HH24:MI:SS'</loader_format></col>
+            </cols>
+</configuration>

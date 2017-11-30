@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--收益互换持仓报告组合每天持仓的收益互换合约D49_SWAP_DETAIL-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+SELECT M.BKE_MVT_CODE,
+   I.INS_ISSUE_DATE,
+   I.INS_MATURITY_DATE,
+   NVL(A.REAL_AMT,0) REAL_AMT,
+   NVL(A.UNREAL_AMT,0) UNREAL_AMT,
+   NVL(M.BAL_AMT,0) BAL_AMT,
+   FND_SHT_DESCRIPTION
+  FROM REF_INSTRUMENT I,
+(SELECT B.BKE_MVT_CODE,F.FND_SHT_DESCRIPTION,
+   SUM(B.BKE_ACC_DEBIT_AMOUNT-B.BKE_ACC_CREDIT_AMOUNT) BAL_AMT
+  FROM HIS_BOOKING_ENTRY B, REF_FUND F
+ WHERE B.ID_BKE_ACCOUNTING = $P{FundCode}
+   AND B.ID_BKE_ACC_DATE BETWEEN to_date(to_char($P{valuationDate},'YYYY')||'-01-01','YYYY-MM-DD') AND $P{valuationDate}
+   AND B.ID_BKE_ACCOUNT = '31029801'
+   AND B.ID_BKE_ACCOUNTING = F.ID_FND_CODE
+   AND F.FND_END_VALIDITY = DATE '2199-12-31'
+ GROUP BY B.BKE_MVT_CODE, F.FND_SHT_DESCRIPTION) M,
+(SELECT B.BKE_MVT_CODE,
+SUM(CASE WHEN B.ID_BKE_ACCOUNT LIKE '611198%' THEN B.BKE_ACC_CREDIT_AMOUNT
+ WHEN B.ID_BKE_ACCOUNT LIKE '601198%' THEN B.BKE_ACC_CREDIT_AMOUNT
+ WHEN B.ID_BKE_ACCOUNT LIKE '641198%' THEN -B.BKE_ACC_DEBIT_AMOUNT
+END) REAL_AMT,
+SUM(CASE WHEN B.ID_BKE_ACCOUNT LIKE '610198%' THEN B.BKE_ACC_CREDIT_AMOUNT
+END) UNREAL_AMT
+  FROM VWH_CF_HIS_BOOKING_ENTRY B
+ WHERE B.ID_BKE_ACCOUNTING = $P{FundCode}
+   AND B.ID_BKE_ACC_DATE = $P{valuationDate}
+   AND SUBSTR(B.ID_BKE_ACCOUNT,0,6) IN ('611198','601198','641198','610198')
+   AND B.BKE_TRADE_NUMBER IS NOT NULL
+ GROUP BY B.BKE_MVT_CODE) A
+ WHERE M.BKE_MVT_CODE = A.BKE_MVT_CODE(+)
+   AND M.BKE_MVT_CODE = I.ID_INS_CODE
+   AND I.ID_INS_CATEGORY = 'SWAT'
+   AND I.INS_END_VALIDITY = DATE '2199-12-31'
+ ORDER BY M.BKE_MVT_CODE
+</querysql>
+           <cols>
+            <col><name>FUNDCODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>BKE_MVT_CODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>INS_ISSUE_DATE</name><mapping></mapping><type>DATETIME</type><loader_format></loader_format></col>
+			<col><name>INS_MATURITY_DATE</name><mapping></mapping><type>DATETIME</type><loader_format></loader_format></col>
+			<col><name>REAL_AMT</name><mapping>row[2]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>UNREAL_AMT</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>BAL_AMT</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>FND_SHT_DESCRIPTION</name><mapping>row[5]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[6]</mapping><type>DATE</type><loader_format></loader_format></col>
+
+           </cols>
+
+        </configuration> 

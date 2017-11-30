@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--固定收益品种信息报告组合每天持有固定收益品种信息D20_Holding_View-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+  <parameter>
+                  <name>FUNDLEVEL</name>
+                  <value></value>
+                  <type>String</type>
+              </parameter>
+           </parameters>
+            <querysql>
+SELECT ID_FND_CODE               基金代码,
+       FND_LNG_DESCRIPTION       基金名称,
+       INS_LNG_DESCRIPTION       证券名称,
+       REPCOD                    证券代码,
+       INS_START_ACCRUAL_DATE    起息日,
+       INS_MATURITY_DATE         到期日,
+       MATURITY_DAYS             剩余到期天数,
+       NEXT_COUPON_DAYS          距下一起息日天数,
+       INS_INTEREST_RATE         票面利率,
+       ISSUE_YEARS               发行年限,
+       COUPON_FREQUENCY_DESC     付息方式,
+       INS_COUPON_FREQUENCY      每年付息次数,
+       NDNA_NEXT_COUPON_DATE     最近付息日,
+       LAST_COUPON_DATE          上一个付息日,
+       COUPON_PAYMENT_COUNT      剩余付息次数,
+       NDNA_ACCRUED_INT          每百元应计利息,
+       NDNA_SHARE_PAR            持仓数量,
+       MV                        持仓金额,
+       NDNA_FUND_INCOME          应计利息,
+       TRA_BROKER                交易对手方
+  FROM TABLE (FNC_HOLDING_VIEW ($P{valuationDate},
+                               (SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+                          FROM REF_FUND F WHERE FND_END_VALIDITY = DATE '2199-12-31'
+                           AND $X{IN,F.ID_FND_CODE,fundsList}
+                           AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel})  ))
+  ORDER BY NEXT_COUPON_DAYS
+        </querysql>
+           <cols>
+<col><name>FUNDCODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>VALUATIONDATE</name><mapping></mapping><type>date</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>FND_LNG_DESCRIPTION</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>INS_LNG_DESCRIPTION</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>REPCOD</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>INS_START_ACCRUAL_DATE</name><mapping>row[4]</mapping><type>DATETIME</type><loader_format></loader_format></col>
+<col><name>INS_MATURITY_DATE</name><mapping>row[5]</mapping><type>DATETIME</type><loader_format></loader_format></col>
+<col><name>MATURITY_DAYS</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>NEXT_COUPON_DAYS</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>INS_INTEREST_RATE</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>ISSUE_YEARS</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>COUPON_FREQUENCY_DESC</name><mapping>row[10]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>INS_COUPON_FREQUENCY</name><mapping>row[11]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>NDNA_NEXT_COUPON_DATE</name><mapping>row[12]</mapping><type>DATETIME</type><loader_format></loader_format></col>
+<col><name>LAST_COUPON_DATE</name><mapping>row[13]</mapping><type>DATETIME</type><loader_format></loader_format></col>
+<col><name>COUPON_PAYMENT_COUNT</name><mapping>row[14]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>NDNA_ACCRUED_INT</name><mapping>row[15]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>NDNA_SHARE_PAR</name><mapping>row[16]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>MV</name><mapping>row[17]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>NDNA_FUND_INCOME</name><mapping>row[18]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>TRA_BROKER</name><mapping>row[19]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>ETLDATE</name><mapping></mapping><type>DATE</type><loader_format></loader_format></col>
+
+           </cols>
+
+        </configuration>

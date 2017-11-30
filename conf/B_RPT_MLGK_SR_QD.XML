@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--境外成交清算表-KNB马来国库境外组合QD_MLGK_SR-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+                 SELECT T.*,C.FND_CURRENCY FND_LNG_DESCRIPTION
+					FROM(SELECT ASSET_CODE,
+					   ASSET_DESC,
+					   FUND_CODE AS SECTOR,
+					   SHARE_PAR,
+					   OTHFEE AS PRICE,
+					   GROSS_AMOUNT,
+					   COMMIN,
+					   STAMPD,
+					   HANFEE,
+					   SETTLE_AMOUNT,
+					   REPO_INCOME_A,
+					   REPO_INCOME AS MV_COST,
+					   BOND_INCOME AS GAINLOSS,
+					   MKT,
+					   TRADE_DATE,
+					   AIM AS TRADE_DIR
+					  FROM TABLE(FNC_QD_MLGK_TRANSACTION (:VALUATIONDATE,:VALUATIONDATE,:FUNDCODE,'','MLGKEN'))
+					 WHERE TRADE_DATE NOT IN ('ALL','IN','OUT')
+					   AND AIM IS NOT NULL
+					 ORDER BY AIM, TRADE_DATE, ASSET_CODE, TRANSACTION_TYPE) T
+					 RIGHT JOIN
+					 (SELECT F.FND_CURRENCY FROM REF_FUND F WHERE F.ID_FND_CODE =:FUNDCODE AND F.FND_END_VALIDITY = DATE '2199-12-31') C
+					 ON 1=1   
+            </querysql>
+           <cols>
+                <col><name>FUNDCODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>VALUATIONDATE</name><mapping></mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+				<col><name>ASSET_CODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ASSET_DESC</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>SECTOR</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>SHARE_PAR</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>PRICE</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>GROSS_AMOUNT</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>COMMIN</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>STAMPD</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>HANFEE</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>SETTLE_AMOUNT</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>MV_COST</name><mapping>row[10]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>GAINLOSS</name><mapping>row[11]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>MKT</name><mapping>row[12]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>TRADE_DATE</name><mapping>row[13]</mapping><type>DATE</type><loader_format></loader_format></col>
+				<col><name>TRADE_DIR</name><mapping>row[14]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>FND_LNG_DESCRIPTION</name><mapping>row[15]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>REPO_INCOME_A</name><mapping>row[16]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>ETLDATE</name><mapping>datetime.datetime.strptime(datetime.datetime.today().strftime('%Y-%m-%d %H-%M-%S'),'%Y-%m-%d %H-%M-%S')DATE</type><loader_format>DATE 'YYYY-MM-DD HH24:MI:SS'</loader_format></col>
+            </cols>
+        </configuration>

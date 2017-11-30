@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--投资比例报告	投资比例数据	D56_FUND_WEIGHT
+-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+				SELECT TITLE,
+				   WEIGHT,
+				   FUND_DESC
+			  FROM TABLE(FNC_FUND_WEIGHT ($P{FundCode}, $P{valuationDate}))   </querysql>
+           <cols>
+		     <col><name>FUNDCODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>TITLE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>WEIGHT</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>FUND_DESC</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[2]</mapping><type>DATE</type><loader_format></loader_format></col>
+            
+           </cols>
+
+        </configuration>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--余额表组合每天的科目余额数据D06_AmountBalance-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+			  <parameter>
+                  <name>ACCOUNTLEVEL</name>
+                  <value></value>
+                  <type>String[]</type>
+              </parameter>
+			  
+           </parameters>
+            <querysql>
+               SELECT ID_GLA_ACCOUNT              科目号,
+   GLA_LNG_DESCRIPTION         科目名称,
+   YEARBEGINBAL_DIR            年初借贷,
+   YEARBEGINBAL_BAL_FUND      年初数,
+   BEGINBAL_DIR                期初借贷,
+   BEGINBAL_BAL_FUND          期初余额,
+   ENDBAL_DIR                  期末借贷,
+   ENDBAL_FUND                期末余额,
+   ACC_DEBIT_FUND             累计借,
+   ACC_CREDIT_FUND            累计贷,
+   PERIOD_DEBIT_FUND          本期借,
+   PERIOD_CREDIT_FUND         本期贷,
+   MOST_DETAIL_ACCOUNT,
+   FND_SHT_DESCRIPTION
+  from table (FNC_AMOUNT_BALANCE($P{FundCode}, $P{startDate}, $P{endDate}, $P{AccountLevel}, $P{BalanceSwitch})) T,
+   (SELECT FND.FND_SHT_DESCRIPTION FROM REF_FUND FND WHERE FND.ID_FND_CODE = $P{FundCode} AND FND.FND_END_VALIDITY = DATE '2199-12-31') F
+            </querysql>
+           <cols>
+            <col><name>FUNDCODE</name><mapping>row[0]</mapping><type>VARCHAR2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>科目号</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>科目名称</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>年初借贷</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>年初数</name><mapping>row[2]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>期初借贷</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>期初余额</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>期末借贷</name><mapping>row[5]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>期末余额</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>累计借</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>累计贷</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>本期借</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>本期贷</name><mapping>row[10]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>MOST_DETAIL_ACCOUNT</name><mapping>row[11]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>FND_SHT_DESCRIPTION</name><mapping>row[12]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>BalanceSwitch</name><mapping>row[13]</mapping><type>VARCHAR2(30)</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[14]</mapping><type>DATE</type><loader_format></loader_format></col>
+           </cols>
+
+        </configuration>

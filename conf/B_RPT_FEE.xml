@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--组合费用统计报告组合每天的各项费用金额D14_3Fees-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+			  <parameter>
+                  <name>FUNDLEVEL</name>
+                  <value></value>
+                  <type>String</type>
+              </parameter>
+           </parameters>
+            <querysql>
+SELECT F.FND_LNG_DESCRIPTION   ANNUITY_NAME,
+   D.TRD_LNG_DESCRIPTION   BANK,
+   FEE1,
+   FEE2,
+   FEE3
+  FROM REF_FUND            F,
+   REF_TRD_MASTER_DATA D,
+   (SELECT F.ID_FND_CODE,
+   F.FND_LNG_DESCRIPTION,
+   F.FND_CRITERIA_1,
+   NVL(SUM(CASE WHEN SUBSTR(B.ID_BKE_ACCOUNT,0,4) = '2206'
+THEN (B.BKE_ACC_CREDIT_AMOUNT-B.BKE_ACC_DEBIT_AMOUNT)
+   END),0) FEE1,
+   NVL(SUM(CASE WHEN SUBSTR(B.ID_BKE_ACCOUNT,0,4) = '2207'
+THEN (B.BKE_ACC_CREDIT_AMOUNT-B.BKE_ACC_DEBIT_AMOUNT)
+   END),0) FEE2,
+   NVL(SUM(CASE WHEN SUBSTR(B.ID_BKE_ACCOUNT,0,4) = '2205'
+THEN (B.BKE_ACC_CREDIT_AMOUNT-B.BKE_ACC_DEBIT_AMOUNT)
+   END),0) FEE3
+  FROM VWH_CF_HIS_BOOKING_ENTRY B, REF_FUND F
+ WHERE B.ID_BKE_ACCOUNTING = F.ID_FND_CODE
+   AND F.FND_END_VALIDITY = DATE '2199-12-31'
+   AND $X{IN,F.ID_FND_CODE,fundsList}
+   AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}
+   AND SUBSTR(B.ID_BKE_ACCOUNT,0,4) IN ('2205','2206','2207')
+   AND B.ID_BKE_ACC_DATE BETWEEN TO_DATE(TO_CHAR($P{valuationDate},'YYYY')||'-01-01','YYYY-MM-DD') AND $P{valuationDate}
+ GROUP BY F.ID_FND_CODE, F.FND_LNG_DESCRIPTION, F.FND_CRITERIA_1) M
+ WHERE 1=1
+   AND $X{IN,F.ID_FND_CODE,fundsList}
+   AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}
+   AND F.FND_END_VALIDITY = DATE '2199-12-31'
+   AND F.ID_FND_CODE = M.ID_FND_CODE (+)
+   AND 'OCR\DEPO\\' || F.FND_CRITERIA_1 = D.ID_TRD_TRANSLATION (+)     --- 第三個斜綫是自己加的
+   AND D.ID_TRD_LANGUE(+) = 'ZH'
+   ORDER BY F.ID_FND_CODE </querysql>
+           <cols>
+              <col><name>FUNDCODE</name><mapping>row[0]</mapping><type>VARCHAR2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>ANNUITY_NAME</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>BANK</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>FEE1</name><mapping>row[2]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>FEE2</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>FEE3</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[5]</mapping><type>DATE</type><loader_format></loader_format></col>
+
+           </cols>
+
+        </configuration>

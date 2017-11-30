@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--公司行为表-KNB马来国库单组合-->
+ <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+			   SELECT REPCOD,
+			   INS_DESC,
+			   TRT,
+			   RECORD_DATE,
+			   TRA_TRADE_DATE,
+			   TRA_VALUE_DATE,
+			   QTY,
+			   RATE_BEFORE_TAX,
+			   RATE_AFTER_TAX,
+			   DVD_BEFORE_TAX,
+			   dvd_AFTER_TAX,
+			   TAX,
+			   DDSD_QTY,
+			   FUND_DESC
+			   FROM TABLE(FNC_QD_MLGK_CA2(:FUNDCODE, :VALUATIONDATE))
+    </querysql>
+            <cols>
+				<col><name>FUND_CODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>VALUATIONDATE</name><mapping></mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+				<col><name>REPCOD</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>INS_DESC</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>TRT</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>RECORD_DATE</name><mapping>row[3]</mapping><type>DATE</type><loader_format></loader_format></col>
+				<col><name>TRA_TRADE_DATE</name><mapping>row[4]</mapping><type>DATE</type><loader_format></loader_format></col>
+				<col><name>TRA_VALUE_DATE</name><mapping>row[5]</mapping><type>DATE</type><loader_format></loader_format></col>
+				<col><name>QTY</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>RATE_BEFORE_TAX</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>RATE_AFTER_TAX</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>DVD_BEFORE_TAX</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>DVD_AFTER_TAX</name><mapping>row[10]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>TAX</name><mapping>row[11]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>DDSD_QTY</name><mapping>row[12]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>FUND_DESC</name><mapping>row[13]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ETLDATE</name><mapping>datetime.datetime.strptime(datetime.datetime.today().strftime('%Y-%m-%d %H-%M-%S'),'%Y-%m-%d %H-%M-%S') </mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD HH24:MI:SS'</loader_format></col>
+            </cols>
+
+        </configuration>

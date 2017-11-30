@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--结算保证金报告组合每天的结算保证金调整数据D41_SettlProvisionForcast-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+SELECT ID_FND_DESC,
+       SHARE_S,
+       SHARE_SHZ,
+       FUND_S,
+       FUND_SHZ,
+       WARR_S,
+       WARR_SHZ,
+       SHARE_TRANSFER_S,
+       SHARE_TRANSFER_SHZ,
+       BONS_S,
+       BOND_SHZ,
+       OTH_S,
+       OTH_SHZ,
+       PROVISION_FORCAST_S,
+       PROVISION_FORCAST_SHZ,
+       PROVISION_BAL_S,
+       PROVISION_BAL_SHZ,
+       PROVISION_BILL_S,
+       PROVISION_BILL_SHZ,
+       PROVISION_BILL_ADJ
+  FROM TABLE(FNC_SETTL_PROVISION_FORCAST($P{startDate},$P{endDate},
+                                         (SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+                                            FROM REF_FUND F
+                                           WHERE FND_END_VALIDITY = DATE '2199-12-31'
+                                             AND $X{IN,F.ID_FND_CODE,fundsList}
+                                             AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),
+                                         $P{SH_Equity_Spread},$P{SZ_Equity_Spread},
+                                         $P{SH_FIX_Spread},$P{SZ_FIX_Spread},
+                                         $P{SH_Equity_Cost},$P{SZ_Equity_Cost},
+                                         $P{SH_FIX_Cost},$P{SZ_FIX_Cost},
+                                         $P{SH_Gl_Account},$P{SZ_Gl_Account},
+                                         $P{BalanceDate},$P{AdjRate}))</querysql>
+           <cols>
+<col><name>FUNDCODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>VALUATIONDATE</name><mapping></mapping><type>date</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>ID_FND_DESC</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SHARE_S</name><mapping>row[1]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>SHARE_SHZ</name><mapping>row[2]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>FUND_S</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>FUND_SHZ</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>WARR_S</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>WARR_SHZ</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>SHARE_TRANSFER_S</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>SHARE_TRANSFER_SHZ</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>BONS_S</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>BOND_SHZ</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>OTH_S</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>OTH_SHZ</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PROVISION_FORCAST_S</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PROVISION_FORCAST_SHZ</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PROVISION_BAL_S</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PROVISION_BAL_SHZ</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PROVISION_BILL_S</name><mapping>0.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PROVISION_BILL_SHZ</name><mapping>1.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>PROVISION_BILL_ADJ</name><mapping>2.2</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>AdjRate</name><mapping>0.1</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SH_Equity_Spread</name><mapping>0.13</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SZ_Equity_Spread</name><mapping>0.15</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SH_FIX_Spread</name><mapping>0.035</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SZ_FIX_Spread</name><mapping>0.015</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SH_Equity_Cost</name><mapping>0.01</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SZ_Equity_Cost</name><mapping>0.01</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SH_FIX_Cost</name><mapping>0.005</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SZ_FIX_Cost</name><mapping>0.005</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SH_Gl_Account</name><mapping>103101,103102</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>SZ_Gl_Account</name><mapping>103103,103104</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+
+           </cols>
+
+        </configuration> 

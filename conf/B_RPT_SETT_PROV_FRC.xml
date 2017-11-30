@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--结算保证金报告	组合每天的结算保证金调整数据	D41_SettlProvisionForcast-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+				SELECT ID_FND_DESC,
+       SHARE_S,
+       SHARE_SHZ,
+       FUND_S,
+       FUND_SHZ,
+       WARR_S,
+       WARR_SHZ,
+       SHARE_TRANSFER_S,
+       SHARE_TRANSFER_SHZ,
+       BONS_S,
+       BOND_SHZ,
+       OTH_S,
+       OTH_SHZ,
+       PROVISION_FORCAST_S,
+       PROVISION_FORCAST_SHZ,
+       PROVISION_BAL_S,
+       PROVISION_BAL_SHZ,
+       PROVISION_BILL_S,
+       PROVISION_BILL_SHZ,
+       PROVISION_BILL_ADJ
+  FROM TABLE(FNC_SETTL_PROVISION_FORCAST($P{startDate},$P{endDate},
+                                         (SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+                                            FROM REF_FUND F
+                                           WHERE FND_END_VALIDITY = DATE '2199-12-31'
+                                             AND $X{IN,F.ID_FND_CODE,fundsList}
+                                             AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),
+                                         $P{SH_Equity_Spread},$P{SZ_Equity_Spread},
+                                         $P{SH_FIX_Spread},$P{SZ_FIX_Spread},
+                                         $P{SH_Equity_Cost},$P{SZ_Equity_Cost},
+                                         $P{SH_FIX_Cost},$P{SZ_FIX_Cost},
+                                         $P{SH_Gl_Account},$P{SZ_Gl_Account},
+                                         $P{BalanceDate},$P{AdjRate}))</querysql>
+           <cols>
+            
+           </cols>
+
+        </configuration>										 

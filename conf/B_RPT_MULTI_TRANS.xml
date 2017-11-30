@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--券商交易报告组合每天不同券商的交易数据D22_MultiSeat_Transaction-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+			  <parameter>
+                  <name>FUNDLEVEL</name>
+                  <value></value>
+                  <type>String</type>
+              </parameter>
+           </parameters>
+		   <querysql>SELECT FUND_CODE,
+					   CUSTODY_DESC,
+					 BROKER_DESC,
+					 STOCK_EXCHANGE,
+					 SEAT,
+					 REPO_AMOUNT,
+					 SHRAE_AMOUNT,
+					 BOND_AMOUNT,
+					 WARR_AMOUNT,
+					 FUND_AMOUNT,
+					 TOTAL_AMOUNT,
+					 COMMIN_PAID,
+					 COMMIN_RATE,
+					 PUR_STAMPD,
+					 SAL_STAMPD
+					 FROM TABLE(FNC_DO_MULTI_SEAT((SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+					  FROM REF_FUND F
+					 WHERE FND_END_VALIDITY = DATE '2199-12-31'
+					   AND $X{IN,F.ID_FND_CODE,fundsList}
+					   AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),
+					  $P{startDate}, $P{endDate}))
+					  </querysql>
+           
+           <cols>  
+			<col><name>FUNDCODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>date</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>CUSTODY_DESC</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>BROKER_DESC</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>STOCK_EXCHANGE</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>SEAT</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>REPO_AMOUNT</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>SHRAE_AMOUNT</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>BOND_AMOUNT</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>WARR_AMOUNT</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>FUND_AMOUNT</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>TOTAL_AMOUNT</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>COMMIN_PAID</name><mapping>row[10]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>COMMIN_RATE</name><mapping>row[11]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>PUR_STAMPD</name><mapping>row[12]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>SAL_STAMPD</name><mapping>row[13]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[14]</mapping><type>DATE</type><loader_format></loader_format></col>  
+           </cols>
+
+        </configuration>

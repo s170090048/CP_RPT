@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--交易清算报告	组合每天的成交清算数据	D03_TradingQuery-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+  <parameter>
+                  <name>FUNDLEVEL</name>
+                  <value></value>
+                  <type>String[]</type>
+              </parameter>
+  <parameter>
+                  <name>EXCHANGETYPE</name>
+                  <value></value>
+                  <type>String[]</type>
+              </parameter>
+  <parameter>
+  <name>ASSETTYPE</name>
+  <value></value>
+  <type>String[]</type>
+              </parameter>
+           </parameters>
+            <querysql>
+                   SELECT  FUND_CODE         组合代码,
+							CASE WHEN TRADE_DATE not IN ('IN','OUT','ALL') then TRADE_DATE END        交易日期,
+							ASSET_CODE        证券代码,
+							ASSET_DESC        证券名称,
+							SHARE_PAR         成交数量,
+							CASE WHEN ROUND(GROSS_AMOUNT,2) = ROUND(GROSS_AMOUNT,3) THEN TRIM(TO_CHAR(GROSS_AMOUNT,'999,999,999,990.99'))
+							 ELSE TRIM(TO_CHAR(GROSS_AMOUNT,'999,999,999,990.999'))
+							END               成交金额,
+							COMMIN            席位佣金,
+							STAMPD            印花税,
+							HANFEE            经手费,
+							TRFFEE            过户费,
+							SMGFEE            证管费,
+							SRFFEE            风险金,
+							OTHFEE            其他费用,
+							BOND_INCOME       债券利息,
+							REPO_INCOME       回购收益,
+							CASE WHEN ROUND(SETTLE_AMOUNT,2) = ROUND(SETTLE_AMOUNT,3) THEN TRIM(TO_CHAR(SETTLE_AMOUNT,'999,999,999,990.99'))
+							 ELSE TRIM(TO_CHAR(SETTLE_AMOUNT,'999,999,999,990.999'))
+							END               实际清算金额,
+							TRANSACTION_TYPE  业务类型,
+							AIM               投资标志,
+							MKT               交易市场,
+							CASE WHEN TRADE_DATE IN ('IN','OUT','ALL') then TRADE_DATE END  DIR
+							FROM TABLE(FNC_DO_TRANSACTION     ($P{startDate},
+							   $P{endDate},
+
+							  (SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+							 FROM REF_FUND F
+							WHERE FND_END_VALIDITY = DATE '2199-12-31'
+							  AND $X{IN,F.ID_FND_CODE,fundsList}
+							  AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),
+
+							   (SELECT wmsys.wm_concat(ASSET_TYPE) FROM(
+							SELECT 'TYPVAL\1' ASSET_TYPE FROM DUAL
+							UNION ALL
+							SELECT 'TYPVAL\2' FROM DUAL
+							UNION ALL
+							SELECT 'TYPVAL\3' FROM DUAL
+							UNION ALL
+							SELECT 'TYPVAL\4' FROM DUAL
+							UNION ALL
+							SELECT 'REME' FROM DUAL
+							UNION ALL
+							SELECT 'SWAT' FROM DUAL
+							UNION ALL
+							SELECT 'FUTU' FROM DUAL
+							UNION ALL
+							SELECT 'OPTI' FROM DUAL
+							UNION ALL
+							SELECT 'TRES' FROM DUAL
+							UNION ALL
+							SELECT 'NATCTR\DPAT' FROM DUAL
+							UNION ALL
+							SELECT 'NATCTR\INPR' FROM DUAL)
+							WHERE $X{IN,ASSET_TYPE,assetType}),
+
+							   (SELECT wmsys.wm_concat(EX) FROM(
+							SELECT S.ID_SKE_STOCK_EXCHANGE EX FROM REF_STOCK_EXCHANGE S WHERE S.SKE_END_VALIDITY = DATE '2199-12-31'
+							UNION ALL
+							SELECT 'X' FROM DUAL)
+							WHERE $X{IN,EX,Exchange}) 
+            </querysql>
+				   <cols>
+						<col><name>FUND_CODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>TRADE_DATE</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+						<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>EXCHANGETYPE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>ASSETTYPE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>ASSET_CODE</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>ASSET_DESC</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>SHARE_PAR</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>GROSS_AMOUNT</name><mapping>row[5]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>COMMIN</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>STAMPD</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>HANFEE</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>TRFFEE</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>SMGFEE</name><mapping>row[10]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>SRFFEE</name><mapping>row[11]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>OTHFEE</name><mapping>row[12]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>BOND_INCOME</name><mapping>row[13]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>REPO_INCOME</name><mapping>row[14]</mapping><type>number</type><loader_format></loader_format></col>
+						<col><name>SETTLE_AMOUNT</name><mapping>row[15]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>TRANSACTION_TYPE</name><mapping>row[16]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>AIM</name><mapping>row[16]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>MKT</name><mapping>row[16]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+						<col><name>DIR</name><mapping>row[16]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+
+						<col>
+						<name>ETLDATE</name>
+						<mapping>datetime.datetime.strptime(datetime.datetime.today().strftime('%Y-%m-%d %H-%M-%S'),'%Y-%m-%d %H-%M-%S')</mapping>
+						<type>DATE</type>
+						<loader_format>DATE 'YYYY-MM-DD HH24:MI:SS'</loader_format>
+						</col>
+				   </cols>
+
+        </configuration>

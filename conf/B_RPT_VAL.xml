@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--估值表组合每天的估值表数据D04_Valuation-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+			   <parameter>
+                  <name>ACCOUNTLEVEL</name>
+                  <value></value>
+                  <type>String[]</type>
+              </parameter>
+           </parameters>
+            <querysql>
+                 SELECT ID_GLA_ACCOUNT,
+       GLA_LNG_DESCRIPTION,
+       NDNA_SHARE_PAR,
+       UNIT_PRICE,
+       NDNA_FUND_COST_PRICE,
+       COST_N,
+       NDNA_VALUATION_PRICE,
+       MV,
+       MV_N,
+       GZZZ,
+       SUS_INFO,
+       NDNA_ACCRUED_INT,
+       (SELECT F.FND_SHT_DESCRIPTION FROM REF_FUND F WHERE F.ID_FND_CODE = $P{FundCode} AND F.FND_END_VALIDITY = DATE '2199-12-31') FND_SHT_DESCRIPTION
+  FROM TABLE(FNC_DO_VALUATION_MAIN($P{FundCode},$P{valuationDate},$P{AccountLevel},'1')) 
+            </querysql>
+           <cols>
+				<col><name>FUND_CODE</name><mapping>row[0]</mapping><type>java.lang.String</type><loader_format></loader_format></col>
+				<col><name>TRADE_DATE</name><mapping>row[1]</mapping><type>java.lang.String</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+				<col><name>ACCOUNTLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ID_GLA_ACCOUNT</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>GLA_LNG_DESCRIPTION</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>NDNA_SHARE_PAR</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>UNIT_PRICE</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>NDNA_FUND_COST_PRICE</name><mapping>row[4]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>COST_N</name><mapping>row[5]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>NDNA_VALUATION_PRICE</name><mapping>row[6]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>MV</name><mapping>row[7]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>MV_N</name><mapping>row[8]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>GZZZ</name><mapping>row[9]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>SUS_INFO</name><mapping>row[10]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>NDNA_ACCRUED_INT</name><mapping>row[11]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>FND_SHT_DESCRIPTION</name><mapping>row[12]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col>
+                   <name>ETLDATE</name>
+                   <mapping>datetime.datetime.strptime(datetime.datetime.today().strftime('%Y-%m-%d %H-%M-%S'),'%Y-%m-%d %H-%M-%S')</mapping>
+                   <type>DATE</type>
+                    <loader_format>DATE 'YYYY-MM-DD HH24:MI:SS'</loader_format>
+                </col>           
+           </cols>
+
+        </configuration>

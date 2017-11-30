@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--公司行为表-KNB马来国库单组合-->
+ <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+     <parameter>
+                  <name>FUNDLEVEL</name>
+                  <value></value>
+                  <type>String[]</type>
+              </parameter>
+           </parameters>
+            <querysql>
+ SELECT CASE WHEN ASSET = 'Daily Growth Rate' THEN 101
+ WHEN ASSET = 'YTD Growth Rate' THEN 102
+ WHEN ASSET = 'Growth Rate Since Inception' THEN 103
+ ELSE RID
+END RID,
+   LPAD(TO_CHAR(RID),5,'0')||LINE_TYPE||ASSET AS ASSET,
+   ASSET as asset2,
+   FUND_DESC,
+   AMT,
+   WEIGHT,
+   WEIGHT2, DAILY_INC, YEAR_INC, ACC_INC
+  FROM TABLE(FNC_MLGK_VALUATION ((SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+  FROM REF_FUND F
+ WHERE FND_END_VALIDITY = DATE '2199-12-31'
+   AND $X{IN,F.ID_FND_CODE,fundsList}
+   AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),$P{valuationDate},'EN'))
+</querysql>
+            <cols>
+<col><name>FUNDCODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>VALUATIONDATE</name><mapping></mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>RID</name><mapping>row[0]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>ASSET</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>ASSET2</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>FUND_DESC</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+<col><name>AMT</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>WEIGHT</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>WEIGHT2</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>DAILY_INC</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>YEAR_INC</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>ACC_INC</name><mapping>row[10]</mapping><type>number</type><loader_format></loader_format></col>
+<col><name>ETLDATE</name><mapping>row[11]</mapping><type>DATE</type><loader_format></loader_format></col>
+
+
+            </cols>
+
+        </configuration>

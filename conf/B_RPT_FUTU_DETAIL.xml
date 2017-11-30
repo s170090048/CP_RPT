@@ -1,0 +1,120 @@
+
+ 
+<?xml version="1.0" encoding="utf-8"?>
+         <!--期货合约持仓报告组合每天持仓的期货合约D50_FUTU_DETAIL-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+SELECT BKE_MVT_CODE, TRD_LNG_DESCRIPTION, INS_TICK, NDNA_SHARE_PAR, PRIX, NDNA_FUND_DIRTY_VALUE, REAL_AMT, UNREAL_AMT, GAINLOSS, PRICE_T, PRICE_T_1, FND_SHT_DESCRIPTION
+  FROM(
+SELECT M.BKE_MVT_CODE,
+       TD.TRD_LNG_DESCRIPTION,
+       I.INS_TICK,
+       NVL(T.NDNA_SHARE_PAR,0) NDNA_SHARE_PAR,
+       NVL(ROUND(CASE WHEN NVL(T.NDNA_SHARE_PAR * I.INS_TICK,0) <>0
+            THEN T.NDNA_FUND_ACTUAL_PRICE/T.NDNA_SHARE_PAR/I.INS_TICK
+       END,2),0) PRIX,
+       NVL(T.NDNA_FUND_ACTUAL_PRICE,0) NDNA_FUND_DIRTY_VALUE,
+       NVL(A.REAL_AMT,0) REAL_AMT,
+       NVL(A.UNREAL_AMT,0) UNREAL_AMT,
+       NVL(A.REAL_AMT,0) + NVL(A.UNREAL_AMT,0) GAINLOSS,
+       NVL(NVL(T.NDNA_VALUATION_PRICE,COURS_VALEUR),0) PRICE_T,
+       NVL(T_1.NDNA_VALUATION_PRICE,0) PRICE_T_1,
+       FND_SHT_DESCRIPTION
+  FROM REF_INSTRUMENT I,
+       REF_CRITERIA   C,
+       REF_TRD_MASTER_DATA TD,
+        (SELECT B.BKE_MVT_CODE,
+                F.FND_SHT_DESCRIPTION,
+                B.BKE_MVT_POS_STATUS_2,
+               SUM(B.BKE_ACC_DEBIT_AMOUNT-B.BKE_ACC_CREDIT_AMOUNT) BAL_AMT
+          FROM HIS_BOOKING_ENTRY B, REF_FUND F
+         WHERE B.ID_BKE_ACCOUNTING = $P{FundCode}
+           AND B.ID_BKE_ACC_DATE BETWEEN TO_DATE(TO_CHAR($P{valuationDate},'YYYY')||'-01-01','YYYY-MM-DD') AND $P{valuationDate}
+           AND B.ID_BKE_ACCOUNT like '3102%'
+           AND B.BKE_MVT_CATEGORY = 'FUTU'
+           AND B.ID_BKE_ACCOUNTING = F.ID_FND_CODE
+           AND F.FND_END_VALIDITY = DATE '2199-12-31'
+         GROUP BY B.BKE_MVT_CODE, F.FND_SHT_DESCRIPTION, B.BKE_MVT_POS_STATUS_2) M,
+        (SELECT B.BKE_MVT_CODE,B.BKE_MVT_POS_STATUS_2,
+                SUM(CASE WHEN B.ID_BKE_ACCOUNT LIKE '6111%' THEN B.BKE_ACC_CREDIT_AMOUNT
+                END) REAL_AMT,
+                SUM(CASE WHEN B.ID_BKE_ACCOUNT LIKE '6101%' THEN B.BKE_ACC_CREDIT_AMOUNT
+                END) UNREAL_AMT
+          FROM VWH_CF_HIS_BOOKING_ENTRY B
+         WHERE B.ID_BKE_ACCOUNTING = $P{FundCode}
+           AND B.ID_BKE_ACC_DATE = $P{valuationDate}
+           AND SUBSTR(B.ID_BKE_ACCOUNT,0,4) IN ('6111','6101')
+           AND B.BKE_TRADE_NUMBER IS NOT NULL
+         GROUP BY B.BKE_MVT_CODE,B.BKE_MVT_POS_STATUS_2) A,
+        (SELECT I.ID_INS_CODE, D.NDNA_VALUATION_PRICE, NDNA_SHARE_PAR, D.NDNA_FUND_ACTUAL_PRICE, D.ID_NDNA_POS_STATUS_2
+          FROM NAV_DETAILED_NET_ASSET D, REF_INSTRUMENT I
+         WHERE D.KEY_NAV_SEQUENCE IN (SELECT MAX(E.KEY_NAV_SEQUENCE) FROM NAV_EVENT E
+                               WHERE E.NEVE_FUND_CODE = $P{FundCode}
+                                 AND E.ID_NEVE_NAV_DATE = $P{valuationDate}
+                                 AND E.NEVE_VALIDITY_STATUS IN ('Y','R')
+                                 AND E.ID_NEVE_NAV_TYPE = 'MAIN')
+         AND D.ID_NDNA_STOCK = 'AD1'
+         AND I.ID_INS_CATEGORY = 'FUTU'
+         AND D.KEY_REF_INSTRUMENT = I.KEY_REF_INSTRUMENT) T,
+        (SELECT DISTINCT I.ID_INS_CODE, D.NDNA_VALUATION_PRICE
+          FROM NAV_DETAILED_NET_ASSET D, REF_INSTRUMENT I
+         WHERE D.KEY_NAV_SEQUENCE IN (SELECT MAX(E.KEY_NAV_SEQUENCE) FROM NAV_EVENT E
+                               WHERE E.NEVE_FUND_CODE = $P{FundCode}
+                                 AND E.ID_NEVE_NAV_DATE = $P{valuationDate}-1
+                                 AND E.NEVE_VALIDITY_STATUS IN ('Y','R')
+                                 AND E.ID_NEVE_NAV_TYPE = 'MAIN')
+         AND D.ID_NDNA_STOCK = 'AD1'
+         AND I.ID_INS_CATEGORY = 'FUTU'
+         AND D.KEY_REF_INSTRUMENT = I.KEY_REF_INSTRUMENT) T_1,
+    (select trim(CODE_VALEUR) CODE_VALEUR, COURS_VALEUR
+      from cours_serveur@gp3core_gp3dba
+     where categorie_valeur = 'FUTU'
+       AND TYPE_COURS_REQUETE = 'CLOT'
+       AND DATE '1752-9-14' - HISTO_DATE_COTATION = $P{valuationDate}) TRA
+ WHERE M.BKE_MVT_CODE = A.BKE_MVT_CODE(+)
+   AND M.BKE_MVT_POS_STATUS_2 = A.BKE_MVT_POS_STATUS_2(+)
+   AND M.BKE_MVT_CODE = I.ID_INS_CODE
+   AND I.ID_INS_CATEGORY = 'FUTU'
+   AND I.INS_END_VALIDITY = DATE '2199-12-31'
+   AND I.KEY_REF_INSTRUMENT = C.KEY_REF_INSTRUMENT
+   AND C.ID_CRI_FAMILY = 'DCL'
+   AND 'OCR\ALCD\\'||C.CRI_CRITERIA_3 = TD.ID_TRD_TRANSLATION(+)    ---第三個 斜綫是自己加的  转义
+   AND TD.ID_TRD_LANGUE(+) = 'ZH'
+   AND M.BKE_MVT_CODE = T.ID_INS_CODE(+)
+   AND M.BKE_MVT_POS_STATUS_2 = T.ID_NDNA_POS_STATUS_2(+)
+   AND M.BKE_MVT_CODE = T_1.ID_INS_CODE(+)
+   AND M.BKE_MVT_CODE = TRA.CODE_VALEUR(+))
+  WHERE NDNA_SHARE_PAR <> 0 OR PRIX<>0 OR NDNA_FUND_DIRTY_VALUE <> 0 OR REAL_AMT <> 0 OR UNREAL_AMT <> 0  OR PRICE_T_1 <> 0
+  ORDER BY BKE_MVT_CODE
+</querysql>
+           <cols>
+                <col><name>FUNDCODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+				<col><name>BKE_MVT_CODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>TRD_LNG_DESCRIPTION</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>INS_TICK</name><mapping></mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>NDNA_SHARE_PAR</name><mapping>row[2]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>PRIX</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>NDNA_FUND_DIRTY_VALUE</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>REAL_AMT</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>UNREAL_AMT</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>GAINLOSS</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>PRICE_T</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>PRICE_T_1</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>FND_SHT_DESCRIPTION</name><mapping>row[10]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ETLDATE</name><mapping>row[11]</mapping><type>DATE</type><loader_format></loader_format></col>
+           </cols>
+
+        </configuration> 

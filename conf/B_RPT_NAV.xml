@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--组合净值统计报告组合每天的净值类数据D23_NAVQuery-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+			  <parameter>
+                  <name>FUNDLEVEL</name>
+                  <value></value>
+                  <type>String</type>
+              </parameter>
+           </parameters>
+            <querysql>
+			select 托管资产代码名称,份额,净值,
+			   to_char(单位净值,'9999999990.'||lpad('9',unit_nuv_decimals_number,'9')) 单位净值,
+			   to_char(累计净值,'9999999990.'||lpad('9',unit_nuv_decimals_number,'9')) 累计净值,
+			   单位净值 NNUV_NUV, 累计净值 acc_nuv
+			  from(
+			SELECT '[' || U2.UNIT_ID_INS_CODE || ']' || U2.UNIT_SHT_DESCRIPTION   托管资产代码名称,
+			   N.NNUV_OUTSTANDING_SHARE      份额,
+			   N.NNUV_UNIT_TOTAL_NET_ASSET   净值,
+			   N.NNUV_NUV                    单位净值,
+			   FNC_DO_ADDUP_NAV (NEVE.NEVE_FUND_CODE, U2.ID_UNIT_CODE, $P{valuationDate}) 累计净值,
+			   u2.unit_nuv_decimals_number
+			  FROM NAV_NET_UNIT N,
+			   REF_UNIT     U,
+			   REF_UNIT     U2,
+			   (SELECT MAX(E.KEY_NAV_SEQUENCE) SEQ, E.NEVE_FUND_CODE
+			  FROM NAV_EVENT E
+			 WHERE E.NEVE_FUND_CODE IN (SELECT DISTINCT F.ID_FND_CODE
+			  FROM REF_FUND F WHERE FND_END_VALIDITY = DATE '2199-12-31'
+			   AND $X{IN,F.ID_FND_CODE,fundsList}
+			   AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel})
+			   AND E.ID_NEVE_NAV_DATE = $P{valuationDate}
+			   AND E.NEVE_VALIDITY_STATUS IN ('Y','R')
+			 GROUP BY E.NEVE_FUND_CODE) NEVE
+			 WHERE N.KEY_NAV_SEQUENCE = NEVE.SEQ
+			   AND N.KEY_REF_UNIT = U.KEY_REF_UNIT
+			   AND U.ID_UNIT_FUND_CODE = U2.ID_UNIT_FUND_CODE
+			   AND U.ID_UNIT_CODE = U2.ID_UNIT_CODE
+			   AND U2.UNIT_END_VALIDITY = DATE '2199-12-31'
+			ORDER BY U2.UNIT_ID_INS_CODE) </querysql>
+           <cols>
+            <col><name>FUNDCODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>FUNDNAME</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>SHARES</name><mapping></mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>NAV</name><mapping>row[2]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>UNIT_NAV</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>SUN_NAV</name><mapping>row[4]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>NNUV_NUV</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>ACC_NUV</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[7]</mapping><type>DATE</type><loader_format></loader_format></col>
+           </cols>
+
+        </configuration>

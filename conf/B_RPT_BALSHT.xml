@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--资产负债表组合每天的资产负债表金额D09_0902_BalanceSheet-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+				SELECT LINE_A,
+				   TITLE_A,
+				   CASE WHEN THIS_YEAR_BAL_A <> 0 THEN trim(TO_CHAR(THIS_YEAR_BAL_A,'999,999,999,999,990.99'))
+				WHEN THIS_YEAR_BAL_A = 0 AND TITLE_A IS NOT NULL THEN '-'
+				   END THIS_YEAR_BAL_A,
+				   CASE WHEN LAST_YEAR_BAL_A <> 0 THEN trim(TO_CHAR(LAST_YEAR_BAL_A,'999,999,999,999,990.99'))
+				WHEN LAST_YEAR_BAL_A = 0 AND TITLE_A IS NOT NULL THEN '-'
+				   END LAST_YEAR_BAL_A,
+				   TITLE_L,
+				   LINE_L,
+				   CASE WHEN THIS_YEAR_BAL_L <> 0 THEN trim(TO_CHAR(THIS_YEAR_BAL_L,'999,999,999,999,990.99'))
+				WHEN THIS_YEAR_BAL_L = 0 AND TITLE_L IS NOT NULL THEN '-'
+				   END THIS_YEAR_BAL_L,
+				   CASE WHEN LAST_YEAR_BAL_L <> 0 THEN trim(TO_CHAR(LAST_YEAR_BAL_L,'999,999,999,999,990.99'))
+				WHEN LAST_YEAR_BAL_L = 0 AND TITLE_L IS NOT NULL THEN '-'
+				   END LAST_YEAR_BAL_L,
+				   FND_SHT_DESCRIPTION
+				  FROM TABLE(FNC_BALANCE_AND_NAV('0902D',$P{FundCode},$P{valuationDate})) B
+            </querysql>
+           <cols>
+            <col><name>FUNDCODE</name><mapping>row[0]</mapping><type>VARCHAR2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>LINE_A</name><mapping></mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>TITLE_A</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>THIS_YEAR_BAL_A</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>LAST_YEAR_BAL_A</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>LINE_L</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>TITLE_L</name><mapping>row[4]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>THIS_YEAR_BAL_L</name><mapping>row[5]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>LAST_YEAR_BAL_L</name><mapping>row[6]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>FND_SHT_DESCRIPTION</name><mapping>row[7]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[8]</mapping><type>DATE</type><loader_format></loader_format></col>
+           </cols>
+
+        </configuration>

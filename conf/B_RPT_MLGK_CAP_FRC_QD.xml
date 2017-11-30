@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--境外头寸预测表-KNB	马来国库境外组合	MLGKGG_CAPITAL_FORECAST-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+               SELECT ITEM, SERIAL_NUMBER, ABSTRACT, DAY1, DAY2, DAY3, DAY4, DAY5, FLAG
+               FROM TABLE(FNC_MLGKGG_CAPITAL_FORECAST(:FUNDCODE,:VALUATIONDATE))
+            </querysql>
+           <cols>
+                <col><name>FUNDCODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>VALUATIONDATE</name><mapping></mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+				<col><name>ITEM</name><mapping>row[0]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>SERIAL_NUMBER</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ABSTRACT</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>DAY1</name><mapping>row[3]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>DAY2</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>DAY3</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>DAY4</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>DAY5</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>FLAG</name><mapping>row[8]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ETLDATE</name><mapping>datetime.datetime.strptime(datetime.datetime.today().strftime('%Y-%m-%d %H-%M-%S'),'%Y-%m-%d %H-%M-%S')DATE</type><loader_format>DATE 'YYYY-MM-DD HH24:MI:SS'</loader_format></col>
+            </cols>
+        </configuration>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--持仓行业报告-证监会	组合每天证监会行业分类	D2803_SectorInvest	专户理财投资组合月度统计报告-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+                    SELECT EXA.SECTOR || ' ' || SECTOR_DESC SECTOR, NVL(M.MV,0) MV,
+                     CASE WHEN TOTAL_NAV  &lt;&gt; 0 THEN NVL(M.MV,0)/TOTAL_NAV END MV_N
+                    FROM
+                    (SELECT SUBSTR(TD.ID_TRD_TRANSLATION,10) SECTOR, TD.TRD_LNG_DESCRIPTION SECTOR_DESC
+                       FROM OWB_DWH.REF_TRD_MASTER_DATA TD
+                      WHERE TD.ID_TRD_TRANSLATION LIKE 'OCR\ECSE\%'
+                        AND TD.ID_TRD_LANGUE = 'ZH'
+                        AND LENGTH(TD.ID_TRD_TRANSLATION) = 10) EXA,
+                    (SELECT SUBSTR(C.OCR_CRITERIA,0,1) SECTOR, SUM(D.NDNA_FUND_DIRTY_VALUE) MV
+                      FROM OWB_DWH.NAV_DETAILED_NET_ASSET D, OWB_DWH.REF_INSTRUMENT I, OWB_DWH.REF_INSTRUMENT I2, OWB_DWH.REF_OTHER_CRITERIA C
+                     WHERE D.KEY_NAV_SEQUENCE = (SELECT MAX(E.KEY_NAV_SEQUENCE)
+                                                   FROM OWB_DWH.NAV_EVENT E
+                                                  WHERE E.NEVE_FUND_CODE =:FUNDCODE
+                                                    AND E.ID_NEVE_NAV_DATE = :VALUATIONDATE
+                                                    AND E.NEVE_VALIDITY_STATUS IN ('Y','R'))
+                       AND D.ID_NDNA_STOCK = 'AD1'
+                       AND D.KEY_REF_INSTRUMENT = I.KEY_REF_INSTRUMENT
+                       AND I.ID_INS_CATEGORY = I2.ID_INS_CATEGORY
+                       AND I.ID_INS_CODE = I2.ID_INS_CODE
+                       AND I2.INS_END_VALIDITY = DATE '2199-12-31'
+                       AND I2.KEY_REF_INSTRUMENT = C.KEY_REF_INSTRUMENT
+                       AND I2.ID_INS_CATEGORY = 'VMOB'
+                       AND C.ID_OCR_FAMILY = 'DCL'  ---- QDII组合可以投资境内资产后的报表改动，需要对资产集进行限制
+                       AND C.ID_OCR_SORT_CRITERIA = 'ECSE'
+                     GROUP BY SUBSTR(C.OCR_CRITERIA,0,1)) M,
+                    (SELECT NVL(SUM(N.NNUV_UNIT_TOTAL_NET_ASSET),0) TOTAL_NAV FROM OWB_DWH.NAV_NET_UNIT N
+                      WHERE N.KEY_NAV_SEQUENCE = (SELECT MAX(E.KEY_NAV_SEQUENCE)
+                                                   FROM OWB_DWH.NAV_EVENT E
+                                                  WHERE E.NEVE_FUND_CODE =:FUNDCODE
+                                                    AND E.ID_NEVE_NAV_DATE =:VALUATIONDATE
+                                                    AND E.NEVE_VALIDITY_STATUS IN ('Y','R'))) N
+
+                     WHERE EXA.SECTOR = M.SECTOR (+)
+                     ORDER BY EXA.SECTOR
+            </querysql>
+           <cols>
+               <col>
+                   <name>FUNDCODE</name>
+                   <mapping></mapping>
+                   <type>VARCHAR2(30)</type>
+                   <loader_format></loader_format>
+               </col>
+               <col>
+                   <name>VALUATIONDATE</name>
+                   <mapping></mapping>
+                   <type>DATE</type>
+                   <loader_format>DATE 'YYYY-MM-DD'</loader_format>
+               </col>
+               <col>
+                   <name>SECTOR</name>
+                   <mapping>row[0]</mapping>
+                   <type>VARCHAR2(30)</type>
+                    <loader_format></loader_format>
+               </col>
+               <col>
+                   <name>MV</name>
+                   <mapping>row[1]</mapping>
+                   <type>NUMBER</type>
+                   <loader_format></loader_format>
+               </col>
+               <col>
+                   <name>MV_N</name>
+                   <mapping>row[2]</mapping>
+                   <type>NUMBER</type>
+                   <loader_format></loader_format>
+               </col>
+                <col>
+                   <name>ETLDATE</name>
+                   <mapping>datetime.datetime.strptime(datetime.datetime.today().strftime('%Y-%m-%d %H-%M-%S'),'%Y-%m-%d %H-%M-%S')</mapping>
+                   <type>DATE</type>
+                    <loader_format>DATE 'YYYY-MM-DD HH24:MI:SS'</loader_format>
+               </col>
+           </cols>
+
+        </configuration>

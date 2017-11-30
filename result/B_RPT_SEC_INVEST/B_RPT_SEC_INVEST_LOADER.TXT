@@ -1,0 +1,8 @@
+options(skip=1) 
+load data  
+infile 'C:/Users/dc02/PycharmProjects/CP_RPT/result/B_RPT_SEC_INVEST/2011-01-01-000041B_RPT_SEC_INVEST.csv' 
+append 
+  into table H_BASE.B_RPT_SEC_INVEST  
+ fields terminated by ',' optionally enclosed by '"'  
+  trailing nullcols  
+(FUNDCODE ,VALUATIONDATE DATE 'YYYY-MM-DD',SECTOR ,MV ,MV_N ,ETLDATE DATE 'YYYY-MM-DD HH24:MI:SS')

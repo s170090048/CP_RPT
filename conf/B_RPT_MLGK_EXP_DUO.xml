@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--公司行为表-KNB马来国库单组合-->
+ <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+     <parameter>
+                  <name>FUNDLEVEL</name>
+                  <value></value>
+                  <type>String[]</type>
+              </parameter>
+           </parameters>
+            <querysql>
+ SELECT RID,
+       LINE_TYPE,
+       LPAD(TO_CHAR(RID),5,'0')||LINE_TYPE||ASSET AS ASSET,
+       ASSET_CODE, ASSET,
+       FUND_DESC,
+       AMT,
+       WEIGHT,
+       WEIGHT_TOTAL,
+       AMT2,
+       AMT3,
+       AMT4,
+       WEIGHT2,WEIGHT_TOTAL_OS,EMPTY_FLAG1,EMPTY_FLAG2
+  FROM TABLE(FNC_MLGK_DPA ((SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+                              FROM REF_FUND F
+                             WHERE FND_END_VALIDITY = DATE '2199-12-31'
+                               AND $X{IN,F.ID_FND_CODE,fundsList}
+                               AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),$P{valuationDate},'EN'))
+    </querysql>
+            <cols>
+		<col><name>FUNDCODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>VALUATIONDATE</name><mapping></mapping><type>date</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+		<col><name>FUNDLEVEL</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>RID</name><mapping>row[0]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>LINE_TYPE</name><mapping>row[1]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>ASSET</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>FUND_DESC</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>AMT</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>WEIGHT</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>AMT2</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>WEIGHT2</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>ASSET_CODE</name><mapping>row[9]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>EMPTY_FLAG1</name><mapping>row[10]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>EMPTY_FLAG2</name><mapping>row[11]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+		<col><name>WEIGHT_TOTAL</name><mapping>row[12]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>AMT3</name><mapping>row[13]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>AMT4</name><mapping>row[14]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>WEIGHT_TOTAL_OS</name><mapping>row[15]</mapping><type>number</type><loader_format></loader_format></col>
+		<col><name>ETLDATE</name><mapping>row[16]</mapping><type>DATE</type><loader_format></loader_format></col>
+
+            </cols>
+
+        </configuration>

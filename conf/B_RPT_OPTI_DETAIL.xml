@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--期权合约持仓报告组合每天持仓的期权合约D51_OPTI_DETAIL-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+				SELECT I.ID_INS_CODE,
+				NVL(C.COD_EXTERNAL_CODE,I.ID_INS_CODE) COD_EXTERNAL_CODE,
+				I2.INS_SHT_DESCRIPTION,
+				I2.INS_LNG_DESCRIPTION,
+				CASE WHEN D.ID_NDNA_POS_STATUS_2 = 'STALIG\ACHLIG' THEN '买入'
+				WHEN D.ID_NDNA_POS_STATUS_2 = 'STALIG\VENLIG' THEN '卖出'
+				WHEN D.ID_NDNA_POS_STATUS_2 = 'STALIG\VEBLIG' THEN '备兑卖出'
+				END AS DES_SHT_DESCRIPTION,
+				D.NDNA_SHARE_PAR,
+				D.NDNA_ASSET_AVERAGE_PRICE / TO_NUMBER(NVL(C2.COD_EXTERNAL_CODE, '1')) UNIT_PRICE,
+				D.NDNA_FUND_COST_PRICE,
+				D.NDNA_VALUATION_PRICE / TO_NUMBER(NVL(C2.COD_EXTERNAL_CODE, '1')) VALUATION_PRICE,
+				D.NDNA_FUND_DIRTY_VALUE,
+				D.NDNA_FUND_DIRTY_VALUE-D.NDNA_FUND_COST_PRICE  UNREAL,
+				F.FND_SHT_DESCRIPTION,
+				TO_NUMBER(NVL(C2.COD_EXTERNAL_CODE, '1')) AS OPMULT
+				FROM NAV_DETAILED_NET_ASSET D, REF_INSTRUMENT I, REF_INSTRUMENT I2, REF_CODIFICATION C, REF_CODIFICATION C2, REF_FUND F
+				WHERE D.KEY_NAV_SEQUENCE IN (SELECT MAX(E.KEY_NAV_SEQUENCE)
+				FROM NAV_EVENT E
+				   WHERE E.NEVE_FUND_CODE = $P{FundCode}
+				 AND E.ID_NEVE_NAV_DATE = $P{valuationDate}
+				 AND E.NEVE_VALIDITY_STATUS IN ('Y','R')
+				 AND E.ID_NEVE_NAV_TYPE = 'MAIN')
+				AND D.ID_NDNA_STOCK = 'AD1'
+				AND I.ID_INS_CATEGORY = 'OPTI'
+				AND D.KEY_REF_INSTRUMENT = I.KEY_REF_INSTRUMENT
+				AND I.ID_INS_CATEGORY = I2.ID_INS_CATEGORY
+				AND I.ID_INS_CODE = I2.ID_INS_CODE
+				AND I2.INS_END_VALIDITY = DATE '2199-12-31'
+				AND I2.KEY_REF_INSTRUMENT = C.KEY_REF_INSTRUMENT(+)
+				AND C.ID_COD_SERVER(+) = 'REPCOD'
+				AND I2.KEY_REF_INSTRUMENT = C2.KEY_REF_INSTRUMENT(+)
+				AND C2.ID_COD_SERVER(+) = 'FACT'
+				AND D.NDNA_FUND_CODE = F.ID_FND_CODE
+				AND F.FND_END_VALIDITY = DATE '2199-12-31'
+</querysql>
+           <cols>
+			<col><name>FUNDCODE</name><mapping>row[0]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+			<col><name>ID_INS_CODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>COD_EXTERNAL_CODE</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>INS_SHT_DESCRIPTION</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>INS_LNG_DESCRIPTION</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>DES_SHT_DESCRIPTION</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>NDNA_SHARE_PAR</name><mapping>row[4]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>UNIT_PRICE</name><mapping>row[5]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>NDNA_FUND_COST_PRICE</name><mapping>row[6]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>VALUATION_PRICE</name><mapping>row[7]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>NDNA_FUND_DIRTY_VALUE</name><mapping>row[8]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>UNREAL</name><mapping>row[9]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>FND_SHT_DESCRIPTION</name><mapping>row[10]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+			<col><name>OPMULT</name><mapping>row[11]</mapping><type>number</type><loader_format></loader_format></col>
+			<col><name>ETLDATE</name><mapping>row[12]</mapping><type>DATE</type><loader_format></loader_format></col>            
+           </cols>
+
+        </configuration> 

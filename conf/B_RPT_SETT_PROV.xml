@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--最低结算备付金报告	组合每天的最低结算备付金数据	D33_SettlProvision-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+           
+           <cols>
+		   SELECT FND_SHT_DESCRIPTION 基金名称,
+			   PUR_S               上海买入证券金额,
+			   PUR_SHZ             深圳买入证券金额,
+			   MIN_S               上海最低结算备付金,
+			   MIN_SHZ             深圳最低结算备付金,
+			   BAL_S               上海最低备付金,
+			   BAL_SHZ             深圳最低备付金,
+			   ADJ_BAL_S           调整上海最低备付金,
+			   ADJ_BAL_SHZ         调整深圳最低备付金,
+			   TOTAL_ADJ           合计调整最低备付金
+  FROM TABLE(FNC_SETTLPROVISION ((SELECT wmsys.wm_concat(DISTINCT F.ID_FND_CODE)
+                                            FROM REF_FUND F
+                                           WHERE FND_END_VALIDITY = DATE '2199-12-31'
+                                             AND $X{IN,F.ID_FND_CODE,fundsList}
+                                             AND $X{IN,F.FND_CLASSIFICATION,CAMC_FundLevel}),
+                                 $P{startDate}, $P{endDate},$P{AdjRate},$P{ShareRate},$P{BondRate},$P{FundRate},$P{WarrRate},$P{LRRRate},$P{LRRate},$P{LORRate}, $P{BalanceDate}))
+
+
+
+           </cols>
+
+        </configuration>

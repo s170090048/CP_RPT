@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+         <!--{???????{??????D10_1002_IncomeStatement-->
+        <configuration>
+           <parameters>
+              <parameter>
+                  <name>FUNDCODE</name>
+                  <value></value>
+                   <type>String</type>
+              </parameter>
+              <parameter>
+                  <name>VALUATIONDATE</name>
+                  <value></value>
+                  <type>Date</type>
+              </parameter>
+           </parameters>
+            <querysql>
+SELECT LINE,
+   TITLE          Ю?,
+   case when THIS_YEAR_BAL is null then '-'
+else trim(TO_CHAR(THIS_YEAR_BAL,'999,999,999,999,990.99'))
+   end ?ǚ??,
+   case when LAST_YEAR_BAL is null then '-'
+else trim(TO_CHAR(LAST_YEAR_BAL,'999,999,999,999,990.99'))
+   end ?ū[??,
+   FND_LNG_DESCRIPTION FND_SHT_DESCRIPTION,
+   FND_CLASSIFICATION
+  FROM TABLE(FNC_DO_PROFIT_STATEMENT ('1002', $P{startDate}, $P{endDate}, $P{FundCode})) T,
+   (SELECT FND.FND_LNG_DESCRIPTION, DECODE(FND.FND_CLASSIFICATION,'TYPOPC\A900','A','Z') FND_CLASSIFICATION FROM REF_FUND FND WHERE FND.ID_FND_CODE = $P{FundCode} AND FND.FND_END_VALIDITY = DATE '2199-12-31') F
+
+            </querysql>
+			   <cols>
+				<col><name>FUNDCODE</name><mapping>row[0]</mapping><type>VARCHAR2(30)</type><loader_format></loader_format></col>
+				<col><name>VALUATIONDATE</name><mapping>row[1]</mapping><type>DATE</type><loader_format>DATE 'YYYY-MM-DD'</loader_format></col>
+				<col><name>LINE</name><mapping></mapping><type>number</type><loader_format></loader_format></col>
+				<col><name>Ю?</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>?ǚ??</name><mapping></mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>?ū[??</name><mapping>row[2]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>FND_SHT_DESCRIPTION</name><mapping>row[3]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>FND_CLASSIFICATION</name><mapping>row[4]</mapping><type>varchar2(30)</type><loader_format></loader_format></col>
+				<col><name>ETLDATE</name><mapping>row[5]</mapping><type>DATE</type><loader_format></loader_format></col>
+			   </cols>
+
+        </configuration>
